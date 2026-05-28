@@ -33,7 +33,6 @@
 #include <openssl/aes.h>
 #include "../include/crypto.h"
 #include "../include/type.h"
-#include "../include/convert.h"
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
