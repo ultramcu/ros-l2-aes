@@ -15,11 +15,9 @@ A small ROS catkin package (`crypto`) that wraps `std_msgs/String` payloads in a
 ros-l2-aes/                           # github.com/ultramcu/ros-l2-aes
 ├── include/
 │   ├── crypto.h                      # AES + hex API (see comments at top)
-│   ├── convert.h                     # tiny string → vector<byte> helper
 │   └── type.h                        # ROS message TYPE codes
 ├── src/
 │   ├── crypto.cpp                    # AES-CBC implementation (OpenSSL legacy AES_* API)
-│   ├── convert.cpp
 │   └── main.cpp                      # ROS node + pub/sub/image-stream entrypoints
 ├── config/
 │   ├── keys.example.h                # template — copy to keys.h and fill in
