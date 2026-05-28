@@ -234,8 +234,6 @@ std::string createJSONMessageV3(int type,bool encypt,std::string dataString)
 
     return json_dump;
 }
-//{\"Data\":\"c1055e261ce28ee03e231488ac8a26abb4d4fe0099054917c9636684aee95811\",\"Time\":1684476004,\"Type\":1}
-//{"Int32":0,"String":"TEST"}
 std::string createJSONMessageV2(int type,bool encypt,std::string dataString, int32_t dataInt32)
 {
     auto start = std::chrono::high_resolution_clock::now();
@@ -616,8 +614,6 @@ int extract_type_from_json(const std_msgs::String::ConstPtr& msg) {
 
     return 0;
 }
-//\"Data\":\"c1055e261ce28ee03e231488ac8a26abb4d4fe0099054917c9636684aee95811\",
-//{\"Data\":\"c1055e261ce28ee03e231488ac8a26abb4d4fe0099054917c9636684aee95811\",\"Time\":1684476004,\"Type\":1}
 void subMessageCallback(const std_msgs::String::ConstPtr& msg)
 {
     auto start_cb = std::chrono::high_resolution_clock::now();
@@ -626,22 +622,6 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
         if (msg->data.c_str()[0] == '{' && msg->data.c_str()[msg->data.length()-1] == '}') {
 
                 
-            /*
-            auto start_json_parse = std::chrono::high_resolution_clock::now();
-            json jst = json::parse(msg->data);
-            std::cout << "time json_parse : " << execution_time(start_json_parse) << std::endl;
-
-
-            auto start_json_data_get = std::chrono::high_resolution_clock::now();
-            std::string encryptData = jst["Data"].get<std::string>();
-            std::cout << "time json_data_get : " << execution_time(start_json_data_get) << std::endl;
-
-
-            auto start_decryptMessageV2 = std::chrono::high_resolution_clock::now();
-            std::string plainData = decryptMessageV2(encryptData);
-            std::cout << "time decryptMessageV2 : " << execution_time(start_decryptMessageV2) << std::endl;
-            */
-
             auto start_extract_data_from_json = std::chrono::high_resolution_clock::now();
 
             std::string data_json_get = extract_data_from_json_substr(msg);
@@ -1015,21 +995,7 @@ bool pubStreamEncryptImage(char *topic)
             ros::shutdown();
         }
 
-        /*
-        int colorType = frame.type();
-
-        if (colorType == CV_8UC1) {
-            std::cout << "Grayscale image" << std::endl;
-        } else if (colorType == CV_8UC3) {
-            std::cout << "RGB color image CV_8UC3" << std::endl;
-        } else if (colorType == CV_8UC4) {
-            std::cout << "RGBA color image CV_8UC4" << std::endl;
-        } else {
-            std::cout << "Unknown color type" << std::endl;
-        }
-        std::cout << "Image dimensions: " << frame.cols << "x" << frame.rows << std::endl;
-        */
-
+        
         auto start_encode = std::chrono::high_resolution_clock::now();
         std::vector<uchar> buffer;
         cv::imencode(".png", frame, buffer);
@@ -1041,14 +1007,7 @@ bool pubStreamEncryptImage(char *topic)
         auto start_vector2Str = std::chrono::high_resolution_clock::now();
         std::string ImageString = "";
         
-        /*
-        char chData[10] = {0};
-        for (unsigned char byte : buffer) {
-            memset(chData,0,sizeof(chData));
-            sprintf(chData,"%02X",static_cast<uint8_t>(byte));
-            ImageString = ImageString + chData;
-        }
-        */
+        
         ImageString = vectorToHexString(buffer);
         
         auto end_vector2Str = std::chrono::high_resolution_clock::now();
@@ -1191,11 +1150,7 @@ bool pubStreamEncryptImagePipe(char *topic)
     return false;
 
 }
-/*
-app [act] [topic] [type] [data]
-    - act echo, pub
-    - type Int32, String
-*/
+
 void * ThTimer(void *arguments)
 {
     double cnt = 0;
@@ -1233,14 +1188,7 @@ void * ThTimer(void *arguments)
     }
   
 }
-/*
-std::string matToBase64(const cv::Mat& mat) {
-    std::vector<uchar> buffer;
-    cv::imencode(".jpg", mat, buffer);
-    std::string base64 = base64_encode(buffer.data(), buffer.size());
-    return base64;
-}
-*/
+
 void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 {
     try
@@ -1256,8 +1204,6 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
 }
 //https://github.com/ros-perception/vision_opencv/blob/rolling/cv_bridge/src/cv_bridge.cpp
 
-/*
-*/
 
 //Encrypt Image
 //This main for stream image via image_transport
