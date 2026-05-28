@@ -116,6 +116,7 @@ See [`CITATION.cff`](CITATION.cff) for a machine-readable citation; in BibTeX:
   title     = {Proposed Technique for Data Security with the AES Algorithm in Robot Operating System},
   booktitle = {2023 27th International Computer Science and Engineering Conference (ICSEC)},
   year      = {2023},
+  doi       = {10.1109/ICSEC59635.2023.10329645},
   url       = {https://ieeexplore.ieee.org/document/10329645}
 }
 ```
