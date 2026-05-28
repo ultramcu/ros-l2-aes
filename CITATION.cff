@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+title: "ROS-L2: Layer-2 AES-CBC encryption for ROS topics"
+message: "If you use this software, please cite the accompanying paper below."
+type: software
+authors:
+  - family-names: Tanadechopon
+    given-names: Teerapong
+    email: teerapong.tana@kmutt.ac.th
+    affiliation: "Institute of Field Robotics, King Mongkut's Institute of Technology Thonburi"
+  - family-names: Kasemsontitum
+    given-names: Boontariga
+    email: boontariga.kas@kmutt.ac.th
+    affiliation: "Institute of Field Robotics, King Mongkut's Institute of Technology Thonburi"
+repository-code: "https://github.com/ultramcu/ros-l2-aes"
+license: MIT
+preferred-citation:
+  type: conference-paper
+  title: "Proposed Technique for Data Security with the AES Algorithm in Robot Operating System"
+  authors:
+    - family-names: Tanadechopon
+      given-names: Teerapong
+    - family-names: Kasemsontitum
+      given-names: Boontariga
+  conference:
+    name: "2023 27th International Computer Science and Engineering Conference (ICSEC)"
+  year: 2023
+  url: "https://ieeexplore.ieee.org/document/10329645"

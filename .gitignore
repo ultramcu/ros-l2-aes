@@ -1,0 +1,19 @@
+# Build artifacts (catkin places these at workspace root, not here, but
+# tolerated in case someone builds in-tree).
+build/
+devel/
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Editor
+*.swp
+.vscode/
+.idea/
+
+# Secrets — copy config/keys.example.h to config/keys.h and fill in
+# your own bytes. NEVER commit config/keys.h.
+config/keys.h
+**/keys.h
+!config/keys.example.h
