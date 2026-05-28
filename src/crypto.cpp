@@ -1,20 +1,16 @@
 // crypto.cpp — AES-CBC encrypt/decrypt + uppercase hex codec.
 // See include/crypto.h for the API contract.
-//
 // Implementation notes:
-//
 //   - Uses OpenSSL's legacy <openssl/aes.h> low-level API (not EVP_*)
 //     to match the paper. On Linux ARM64 + macOS arm64 (via Parallels)
 //     OpenSSL >= 1.1.1 still dispatches the legacy AES_cbc_encrypt
 //     through aes_v8_*, which means the ARMv8 Cryptography Extensions
 //     are used transparently.
-//
 //   - CBC mode with a fixed IV per key length (loaded from
 //     config/keys.h). Reusing a fixed IV is acceptable inside the paper
 //     experiment because each message has a distinct timestamp / type
 //     wrapping it in JSON; do not lift the AES routines out of this
 //     context without revisiting IV handling.
-//
 //   - Padding is manual zero-extension to the next 16-byte boundary.
 //     Plaintext of N bytes ends up as ceil(N / 16) * 16 bytes of
 //     ciphertext. Callers track the original length out of band (the
@@ -114,14 +110,12 @@ uint32_t aes256Decrypt(uint8_t* src, uint32_t src_len, uint8_t* dst, uint32_t ds
 // ---------------------------------------------------------------------
 // AES-512 — DEPRECATED
 // ---------------------------------------------------------------------
-//
 // AES does not specify a 512-bit key mode. The original code passed a
 // 512-bit key length to AES_set_encrypt_key, which returns -2 ("bad
 // key length") and leaves the key schedule undefined; downstream
 // AES_cbc_encrypt then operated on uninitialised round keys. That path
 // produced ciphertext but was not real AES and was not invertible
 // across builds.
-//
 // We keep the symbols so callers from earlier paper revisions still
 // link, but delegate to aes256Encrypt / aes256Decrypt and document the
 // removal. New code MUST use aes256Encrypt / aes256Decrypt directly.

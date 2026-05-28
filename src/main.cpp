@@ -30,7 +30,6 @@
 #include <queue>
 #include <mutex>
 
-//#include "base64.h"
 using json = nlohmann::json;
 
 
@@ -56,7 +55,6 @@ uint32_t CNT_PUB = 0;
 
 std::string encryptMessageV2(std::string message)
 {
-    //ROS_INFO("encryptMessageV2");
     auto start_mem = std::chrono::high_resolution_clock::now();
     uint8_t *json_msg_enc;
     uint32_t json_msg_enc_mem_size = sizeof(uint8_t) * (int(message.length()) + 1024);
@@ -65,13 +63,9 @@ std::string encryptMessageV2(std::string message)
 
 	uint32_t json_msg_enc_size = 0;
 	uint32_t json_msg_enc_str_size = 0;
-    //uint32_t json_msg_enc_mem_size = uint32_t(sizeof(uint8_t) * (int(message.length()) + 1024));
     std::string ret_str = "";
     auto end_mem = std::chrono::high_resolution_clock::now();
 
-    //printf("json_msg_enc_mem_size = %d\r\n",json_msg_enc_mem_size);
-    //printf("json_msg_enc_str_mem_size = %d\r\n",json_msg_enc_str_mem_size);
-    //printf("message = %s, message.length() = %ld\r\n",message.c_str(),message.length());
 
     json_msg_enc = (uint8_t *)malloc(json_msg_enc_mem_size);
     memset(json_msg_enc,0,json_msg_enc_mem_size);
@@ -83,20 +77,12 @@ std::string encryptMessageV2(std::string message)
     json_msg_enc_size = aes256Encrypt((uint8_t *)message.c_str(),strlen(message.c_str()),json_msg_enc,json_msg_enc_mem_size);
     auto end_aes256Encrypt = std::chrono::high_resolution_clock::now();
 
-    //json_msg_enc_size = aes512Encrypt((uint8_t *)message.c_str(),strlen(message.c_str()),json_msg_enc,json_msg_enc_mem_size);
-    //printf("json_msg_enc_size = %d\r\n",json_msg_enc_size);
     auto start_bytesToHex = std::chrono::high_resolution_clock::now();
-    //json_msg_enc_str_size = bytearray_to_hexstr(json_msg_enc,json_msg_enc_size,json_msg_enc_str,json_msg_enc_str_mem_size);
     ret_str = bytesToHex(json_msg_enc,json_msg_enc_size);
 
     
     auto end_bytesToHex = std::chrono::high_resolution_clock::now();
     
-
-    //ret_str = std::string((char *)json_msg_enc_str);
-
-    //printf("ret_str len = %ld\r\n",ret_str.length());
-
 
     auto start_mem_fee = std::chrono::high_resolution_clock::now();
     free(json_msg_enc);
@@ -114,19 +100,6 @@ std::string encryptMessageV2(std::string message)
     double micro_sec_mem_free = duration_mem_free.count();
     
 
-    //std::cout << "micro_sec_aes256Encrypt: " << micro_sec_aes256Encrypt << " us" << std::endl;
-    //std::cout << "micro_bytesToHex: " << micro_bytesToHex << " us" << std::endl;
-    //std::cout << "Memory allocation time: " << micro_sec_mem << " us" << std::endl;
-    //std::cout << "Memory free time: " << micro_sec_mem_free << " us" << std::endl;
-    //std::cout << "Memory time: " << micro_sec_mem + micro_sec_mem_free << " us" << std::endl;
-    //std::cout << "Total time: " << micro_sec + micro_sec_mem + micro_sec_mem_free << " us" << std::endl;
-
-
-    //char report[200] = {0};
-    //sprintf(report,"echo \"%ld,%ld,%ld\" >> \"/media/psf/ROS/l2/result/time2.txt\"",duration.count(),duration_mem.count(),duration_mem_free.count());
-    //sprintf(report,"echo %ld >> \"/media/psf/ROS/l2/result/time2.txt\"",duration.count());
-    //system(report);
-
     return ret_str;
 
 }
@@ -142,9 +115,6 @@ std::string decryptMessageV2(std::string encryptMessage)
     uint32_t json_msg_mem_size = sizeof(uint8_t) * (int(encryptMessage.length()) + 1024);
     std::string ret_str = "";
 
-    //printf("encryptMessage len = %d\r\n",encryptMessage.length());
-    //printf("json_msg_enc_mem_size = %d\r\n",json_msg_enc_mem_size);
-    //printf("json_msg_mem_size = %d\r\n",json_msg_mem_size);
 
     if (encryptMessage.length() == 0) {
         return "";
@@ -160,15 +130,12 @@ std::string decryptMessageV2(std::string encryptMessage)
 
     auto start_hexToBytes = std::chrono::high_resolution_clock::now();
     json_msg_enc_len = hexToBytes((uint8_t *)encryptMessage.c_str(),encryptMessage.length(),json_msg_enc,json_msg_enc_mem_size);
-    //std::cout << "\ttime hexstr_to_bytearray : " << execution_time(start_hexToBytes) << std::endl;
 
     auto start_aes256Decrypt = std::chrono::high_resolution_clock::now();
     json_msg_len = aes256Decrypt(json_msg_enc,json_msg_enc_len,json_msg,json_msg_mem_size);
-    //std::cout << "\ttime decrypt256_data : " << execution_time(start_aes256Decrypt) << std::endl;
 
 
     ret_str = std::string((char *)json_msg);
-    //printf("ret_str len = %d\r\n",ret_str.length());
 
     free(json_msg_enc);
     free(json_msg);
@@ -184,14 +151,12 @@ std::string createPlainStringMessage(bool encypt,std::string dataString)
 
     if(encypt)
     {
-        //printf("dataString.length() = %ld\r\n",dataString.length());
         encMsg = encryptMessageV2(dataString);
     }
     else
     {
         encMsg = dataString;
     }
-        //printf("encMsg.length() = %ld\r\n",encMsg.length());
 
     return encMsg; 
 }
@@ -199,7 +164,6 @@ std::string createJSONMessage(int type,bool encypt,std::string dataString, int32
 {
     auto start = std::chrono::high_resolution_clock::now();
           
-    //ROS_INFO("createJSONMessage");  
     nlohmann::json json;
     nlohmann::json jsonData;
 
@@ -211,12 +175,8 @@ std::string createJSONMessage(int type,bool encypt,std::string dataString, int32
 
     if(encypt)
     {
-        //ROS_INFO("createJSONMessage, encypt data");  
         std::string encMsg = encryptMessageV2(jsonData.dump());
         json["Data"] = encMsg;
-        //std::cout << "encypted message size = " << encMsg.length() << " byte" << std::endl;
-        //printf("dataString.length() = %ld\r\n",dataString.length());
-        //printf("decryptMessage = %s\r\n",decryptMessage(encMsg).c_str());
     }
     else
     {
@@ -225,14 +185,11 @@ std::string createJSONMessage(int type,bool encypt,std::string dataString, int32
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    //std::cout << "createJSONMessage time: " << duration.count() << " us" << std::endl;
-    //ROS_INFO("createJSONMessage, ENd");  
 
     auto start_dump = std::chrono::high_resolution_clock::now();
     std::string json_dump = json.dump(); 
     auto end_dump = std::chrono::high_resolution_clock::now();
     auto duration_dump = std::chrono::duration_cast<std::chrono::microseconds>(end_dump - start_dump);
-    //std::cout << "duration_dump: " << duration_dump.count() << " us" << std::endl;
 
     return json_dump;
 }
@@ -257,7 +214,6 @@ std::string createJSONMessageV3(int type,bool encypt,std::string dataString)
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    //std::cout << "createJSONMessage time: " << duration.count() << " us" << std::endl;
 
     #ifdef LOG_PUB_TIME
     double time_total = duration.count();
@@ -275,7 +231,6 @@ std::string createJSONMessageV3(int type,bool encypt,std::string dataString)
 
     auto end_dump = std::chrono::high_resolution_clock::now();
     auto duration_dump = std::chrono::duration_cast<std::chrono::microseconds>(end_dump - start_dump);
-    //std::cout << "duration_dump: " << duration_dump.count() << " us" << std::endl;
 
     return json_dump;
 }
@@ -285,15 +240,6 @@ std::string createJSONMessageV2(int type,bool encypt,std::string dataString, int
 {
     auto start = std::chrono::high_resolution_clock::now();
           
-    //ROS_INFO("createJSONMessage");  
-    //nlohmann::json json;
-    //nlohmann::json jsonData;
-
-    //jsonData["String"] = dataString;
-    //jsonData["Int32"] = dataInt32;
-
-    //json["Type"] = type;
-    //json["Time"] = (unsigned long)time(NULL);
 
     std::stringstream jsonDataString;
     std::stringstream jsonString;
@@ -303,39 +249,25 @@ std::string createJSONMessageV2(int type,bool encypt,std::string dataString, int
     if(encypt)
     {
 
-        //ROS_INFO("createJSONMessage, encypt data");  
-        //std::string jDataDump = jsonData.dump();
-        //std::cout << "jDataDump = " << jDataDump << std::endl;
-        //std::string encMsg = encryptMessageV2(jDataDump);
-        //json["Data"] = encMsg;
         
         jsonDataEnc = encryptMessageV2(jsonDataString.str());
-        //std::cout << "encypted message size = " << encMsg.length() << " byte" << std::endl;
-        //printf("dataString.length() = %ld\r\n",dataString.length());
-        //printf("decryptMessage = %s\r\n",decryptMessage(encMsg).c_str());
     }
     else
     {
-        //json["Data"] = jsonData;
         jsonDataEnc = jsonDataString.str();
     }
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    //std::cout << "createJSONMessage time: " << duration.count() << " us" << std::endl;
-    //ROS_INFO("createJSONMessage, ENd");  
 
     auto start_dump = std::chrono::high_resolution_clock::now();
-    //std::string json_dump = json.dump(); 
 
-    //std::stringstream jsonString;
     jsonString << "{\"Data\":\"" << jsonDataEnc << "\",\"Time\":" << (unsigned long)time(NULL) << ",\"Type\":" << type << "}";
     std::string json_dump = jsonString.str();
 
 
     auto end_dump = std::chrono::high_resolution_clock::now();
     auto duration_dump = std::chrono::duration_cast<std::chrono::microseconds>(end_dump - start_dump);
-    //std::cout << "duration_dump: " << duration_dump.count() << " us" << std::endl;
 
     return json_dump;
 }
@@ -358,19 +290,15 @@ std::string createPubMessageFile(std::string filename)
 
     file_stream.close(); // Close the file
 
-    //printf("Text in file : %s\r\n",text.c_str());
     std::cout << "file size = " << text.length() << " byte" << std::endl;
     return createJSONMessageV2(TYPE_eString,true,text,0);
-    //return createPlainStringMessage(true,text);
 }
 std::string createPubMessageString(std::string data) 
 {
-    //ROS_INFO("createPubMessageString");
     return createJSONMessageV3(TYPE_eString,true,data);
 }
 std::string createPubImageString(std::string data) 
 {
-    //ROS_INFO("createPubMessageString");
     return createJSONMessageV3(TYPE_Image320x240,true,data);
 }
 std::string createPubMessageInt32(int32_t data) 
@@ -441,12 +369,7 @@ std::string extract_data_from_json_substr(const std_msgs::String::ConstPtr& msg)
     size_t endIndex = jsonString.find(endSearch);
 
 
-    // std::cout << "startIndex: " << startIndex << std::endl;
-    // std::cout << "endIndex: " << endIndex << std::endl;
-
     return jsonString.substr(startIndex, endIndex - startIndex);
-
-    // std::cout << "Extracted string: " << extractedString << std::endl;
 
 
 }
@@ -456,13 +379,11 @@ std::string extract_data_from_json(const std_msgs::String::ConstPtr& msg) {
     std::string data = "";
     uint32_t slen =  msg->data.length();
     uint8_t st = 0;
-                    //std::cout << "slen = " << slen << std::endl;
     for(uint32_t i = 0; i < slen; i++) {
         switch(st) {
             case 0:
                 if (msg->data.c_str()[i] == '\"') {
                     st = 1;
-                    //std::cout << "st = 1" << std::endl;
                 }
                 break;
             case 1:
@@ -543,7 +464,6 @@ std::string extract_string_from_json(std::string msg) {
             case 0:
                 if (msg.c_str()[i] == '\"') {
                     st = 1;
-                    //std::cout << "st = 1" << std::endl;
                 }
                 break;
             case 1:
@@ -631,13 +551,11 @@ int extract_type_from_json(const std_msgs::String::ConstPtr& msg) {
     std::string data = "";
     uint32_t slen =  msg->data.length();
     uint8_t st = 0;
-                    //std::cout << "slen = " << slen << std::endl;
     for(uint32_t i = 0; i < slen; i++) {
         switch(st) {
             case 0:
                 if (msg->data.c_str()[i] == '\"') {
                     st = 1;
-                    //std::cout << "st = 1" << std::endl;
                 }
                 break;
             case 1:
@@ -702,17 +620,12 @@ int extract_type_from_json(const std_msgs::String::ConstPtr& msg) {
 //{\"Data\":\"c1055e261ce28ee03e231488ac8a26abb4d4fe0099054917c9636684aee95811\",\"Time\":1684476004,\"Type\":1}
 void subMessageCallback(const std_msgs::String::ConstPtr& msg)
 {
-    //printf("subMessageCallback : %s\r\n",msg->data.c_str());
     auto start_cb = std::chrono::high_resolution_clock::now();
     if (msg->data.length() > 0) {
 
         if (msg->data.c_str()[0] == '{' && msg->data.c_str()[msg->data.length()-1] == '}') {
 
                 
-            //auto start_json_parse = std::chrono::high_resolution_clock::now();
-            //json jst = json::parse(msg->data);
-            //std::cout << "time json_parse : " << execution_time(start_json_parse) << std::endl;
-            //execution_time
             /*
             auto start_json_parse = std::chrono::high_resolution_clock::now();
             json jst = json::parse(msg->data);
@@ -727,24 +640,16 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
             auto start_decryptMessageV2 = std::chrono::high_resolution_clock::now();
             std::string plainData = decryptMessageV2(encryptData);
             std::cout << "time decryptMessageV2 : " << execution_time(start_decryptMessageV2) << std::endl;
-            //printf("plainData : %s\r\n",plainData.c_str());
             */
 
             auto start_extract_data_from_json = std::chrono::high_resolution_clock::now();
-            // std::string data_json_get = extract_data_from_json(msg);
-            // std::cout << "time extract_data_from_json : " << execution_time(start_extract_data_from_json) << std::endl;
 
             std::string data_json_get = extract_data_from_json_substr(msg);
-            //std::cout << "time extract_data_from_json_substr : " << execution_time(start_extract_data_from_json) << std::endl;
 
             
-            //std::cout << "data_json_get : " << data_json_get << std::endl;
-            // std::cout << "time extract_data_from_json : " << execution_time(start_extract_data_from_json) << std::endl;
-
             auto start_decryptMessageV2 = std::chrono::high_resolution_clock::now();
             std::string str_data = decryptMessageV2(data_json_get);
             double time_execu =  execution_time(start_decryptMessageV2);
-            //std::cout << "time decryptMessageV2 : " << time_execu << std::endl;
 
             #ifdef LOG_SUB_TIME
                 char sys[200];
@@ -753,9 +658,6 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
             #endif
 
 
-            //auto start_json_parse2 = std::chrono::high_resolution_clock::now();
-            //json jdata = json::parse(plainData);
-            //std::cout << "time json_parse2 : " << execution_time(start_json_parse2) << std::endl;
             int type;
 
             if (data_json_get.length() > 10000) {
@@ -763,28 +665,10 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
             } else {
                 auto start_extract_type_from_json = std::chrono::high_resolution_clock::now();
                 type = extract_type_from_json(msg);
-                //std::cout << "time extract_type_from_json : " << execution_time(start_extract_type_from_json) << std::endl;
             }
 
-            // std::string str_data;
-            // if (type == TYPE_eInt32) {
-            //     str_data = extract_string_from_json(plainData);
-            // } else {
-            //     auto start_extract_string_from_json = std::chrono::high_resolution_clock::now();
-            //     str_data = extract_string_from_json(plainData);
-            //     std::cout << "time extract_string_from_json : " << execution_time(start_extract_string_from_json) << std::endl;
-            // }
 
-            
             //V3 remove type Int32, String
-            // std::string str_data;
-            // if (type == TYPE_eInt32) {
-            //     str_data = plainData;
-            // } else {
-            //     // auto start_extract_string_from_json = std::chrono::high_resolution_clock::now();
-            //     str_data = plainData;
-            //     // std::cout << "time extract_string_from_json : " << execution_time(start_extract_string_from_json) << std::endl;
-            // }
 
 
             if(type == TYPE_eInt32)
@@ -806,8 +690,6 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
                 auto start_hexStringToVector3 = std::chrono::high_resolution_clock::now();
                 std::vector<unsigned char> buffer = hexStringToVector3(str_data);
                 std::cout << "time hexStringToVector3 : " << execution_time(start_hexStringToVector3) << std::endl;
-                //printf("Vector size = %d\r\n",buffer.size());
-                //cv::Mat image(240,320, CV_8UC3, buffer.data());
 
                 #ifdef _SUB_SHOW_IMAGE_
                     auto start_imdecode = std::chrono::high_resolution_clock::now();
@@ -827,7 +709,6 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
                         TIME_START = true;
                     }
                     CNT_SUB++;
-                    //auto start_namedWindow = std::chrono::high_resolution_clock::now();
 
                     #ifdef _SUB_SHOW_IMAGE_
                         cv::namedWindow("Image Window", cv::WINDOW_NORMAL);  // Create a window
@@ -838,12 +719,10 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
                 }
 
             }
-            //std::cout << "time start_cb : " << execution_time(start_cb) << std::endl;
             printf("---\r\n");
         } else {
                 std::string plainData = decryptMessageV2(msg->data);
                 printf("data XXXX : %s, len : %ld\r\n",plainData.c_str(),plainData.length());
-                //printf("data XXXX : xx, len : %ld\r\n",plainData.length());
             printf("XXX ---\r\n");
         }
      }
@@ -853,13 +732,11 @@ void subMessageCallback(const std_msgs::String::ConstPtr& msg)
 
 void subMessageCallback2(const std_msgs::String::ConstPtr& msg)
 {
-    //printf("subMessageCallback : %s\r\n",msg->data.c_str());
     if (msg->data.length() > 0) {
 
         if (msg->data.c_str()[0] == '{' && msg->data.c_str()[msg->data.length()-1] == '}') {
 
                 
-            //execution_time
             auto start_json_parse = std::chrono::high_resolution_clock::now();
             json jst = json::parse(msg->data);
             std::cout << "time json_parse : " << execution_time(start_json_parse) << std::endl;
@@ -873,7 +750,6 @@ void subMessageCallback2(const std_msgs::String::ConstPtr& msg)
             auto start_decryptMessageV2 = std::chrono::high_resolution_clock::now();
             std::string plainData = decryptMessageV2(encryptData);
             std::cout << "time decryptMessageV2 : " << execution_time(start_decryptMessageV2) << std::endl;
-            //printf("plainData : %s\r\n",plainData.c_str());
 
             json jdata = json::parse(plainData);
 
@@ -900,8 +776,6 @@ void subMessageCallback2(const std_msgs::String::ConstPtr& msg)
                 auto start_hexStringToVector3 = std::chrono::high_resolution_clock::now();
                 std::vector<unsigned char> buffer = hexStringToVector3(jdata["String"].get<std::string>());
                 std::cout << "time hexStringToVector3 : " << execution_time(start_hexStringToVector3) << std::endl;
-                //printf("Vector size = %d\r\n",buffer.size());
-                //cv::Mat image(240,320, CV_8UC3, buffer.data());
                 auto start_imdecode = std::chrono::high_resolution_clock::now();
                 cv::Mat image = cv::imdecode(buffer, cv::IMREAD_COLOR);
                 std::cout << "time imdecode : " << execution_time(start_imdecode) << std::endl;
@@ -913,18 +787,12 @@ void subMessageCallback2(const std_msgs::String::ConstPtr& msg)
                         TIME_START = true;
                     }
                     CNT_SUB++;
-                    //auto start_namedWindow = std::chrono::high_resolution_clock::now();
                     cv::namedWindow("Image Window", cv::WINDOW_NORMAL);  // Create a window
-                    //std::cout << "time namedWindow : " << execution_time(start_namedWindow) << std::endl;
 
 
-                    //auto start_imshow = std::chrono::high_resolution_clock::now();
                     cv::imshow("Image Window", image);  // Show the image in the window
-                    //std::cout << "time imshow : " << execution_time(start_imshow) << std::endl;
 
-                    //auto start_waitKey = std::chrono::high_resolution_clock::now();
                     cv::waitKey(1);  // Wait for a key press
-                    //std::cout << "time waitKey : " << execution_time(start_waitKey) << std::endl;
 
                 }
 
@@ -933,7 +801,6 @@ void subMessageCallback2(const std_msgs::String::ConstPtr& msg)
         } else {
                 std::string plainData = decryptMessageV2(msg->data);
                 printf("data XXXX : %s, len : %ld\r\n",plainData.c_str(),plainData.length());
-                //printf("data XXXX : xx, len : %ld\r\n",plainData.length());
             printf("XXX ---\r\n");
         }
      }
@@ -943,7 +810,6 @@ bool pubOneMessageX(char *topic, char *type, char *data,uint32_t time)
 {
    ros::NodeHandle nh;
     ros::Publisher publisher = nh.advertise<std_msgs::String>(std::string(topic),1000);
-    //ros::Publisher publisher = nh.advertise<std_msgs::String>("encypt_message_publisher",1000);
     std_msgs::String msg;
     ros::Rate loop_rate(1000); //In Herz
     ros::Rate loop_rate2(0.5);
@@ -956,15 +822,10 @@ bool pubOneMessageX(char *topic, char *type, char *data,uint32_t time)
             first = false;
             while(publisher.getNumSubscribers() == 0)
             {
-                //ROS_ERROR("Waiting for subscibers");
                 poll_rate.sleep();
             }
-        //loop_rate.sleep(); 
             loop_rate2.sleep(); //Sleep 2sec
         }
-        //printf("publisher.getNumSubscribers() = %d\r\n",publisher.getNumSubscribers());
-        //ROS_ERROR("Got subscriber");
-        //printf("ros::ok, topic : %s, type : %s, data : %s\r\n",topic,type,data);
         
         if(strncmp(type,"Int32",5) == 0 || strncmp(type,"int32",5) == 0)
         {
@@ -990,8 +851,6 @@ bool pubOneMessageX(char *topic, char *type, char *data,uint32_t time)
             return false;
         }
 
-        //printf("message : %s\r\n",msg.data.c_str());
-        //printf("message : %s\r\n",msg.data.c_str());
         if (msg.data != "") {
             publisher.publish(msg);
         } else {
@@ -1016,24 +875,16 @@ bool pubOneMessage(char *topic, char *type, char *data)
 {
     ros::NodeHandle nh;
     ros::Publisher publisher = nh.advertise<std_msgs::String>(std::string(topic),1000);
-    //ros::Publisher publisher = nh.advertise<std_msgs::String>("encypt_message_publisher",1000);
     std_msgs::String msg;
     ros::Rate loop_rate(1); //In Herz
-    //ros::Rate loop_rate2(2);
     ros::Rate poll_rate(2);
     while(ros::ok())
     {
-        //ROS_INFO("ros::ok()");
         while(publisher.getNumSubscribers() == 0)
         {
-            //ROS_ERROR("Waiting for subscibers");
             poll_rate.sleep();
         }
         loop_rate.sleep(); 
-        //loop_rate2.sleep();
-        //printf("publisher.getNumSubscribers() = %d\r\n",publisher.getNumSubscribers());
-        //ROS_ERROR("Got subscriber");
-        //printf("ros::ok, topic : %s, type : %s, data : %s\r\n",topic,type,data);
         
         if(strncmp(type,"Int32",5) == 0 || strncmp(type,"int32",5) == 0)
         {
@@ -1041,7 +892,6 @@ bool pubOneMessage(char *topic, char *type, char *data)
         }
         else if(strncmp(type,"String",6) == 0 || strncmp(type,"string",6) == 0)
         {
-            //ROS_INFO("Type : String");
             msg.data = createPubMessageString(std::string(data));
         }
         else if(strncmp(type,"File",4) == 0 || strncmp(type,"file",4) == 0)
@@ -1058,8 +908,6 @@ bool pubOneMessage(char *topic, char *type, char *data)
             return false;
         }
 
-        //printf("message : %s\r\n",msg.data.c_str());
-        //printf("message : %s\r\n",msg.data.c_str());
         if (msg.data != "") {
             publisher.publish(msg);
         } else {
@@ -1102,10 +950,8 @@ bool pubStreamEncryptImage(char *topic)
 {
     ros::NodeHandle nh;
     ros::Publisher publisher = nh.advertise<std_msgs::String>(std::string(topic),1000);
-    //ros::Publisher publisher = nh.advertise<std_msgs::String>("encypt_message_publisher",1000);
     std_msgs::String msg;
     ros::Rate loop_rate(100000); //In Herz
-    //ros::Rate loop_rate2(2);
     ros::Rate poll_rate(1);
 
 
@@ -1156,14 +1002,9 @@ bool pubStreamEncryptImage(char *topic)
                 ROS_ERROR("Waiting for subscibers");
                 poll_rate.sleep();
             }
-        //loop_rate.sleep(); 
             poll_rate.sleep(); //Sleep 2sec
             TIME_START = true;
         }
-        //loop_rate2.sleep();
-        //printf("publisher.getNumSubscribers() = %d\r\n",publisher.getNumSubscribers());
-        //ROS_ERROR("Got subscriber");
-        //printf("ros::ok, topic : %s, type : %s, data : %s\r\n",topic,type,data);
         
         auto start_total = std::chrono::high_resolution_clock::now();
         capture >> frame; 
@@ -1195,7 +1036,6 @@ bool pubStreamEncryptImage(char *topic)
         auto end_encode = std::chrono::high_resolution_clock::now();
         auto duration_encode = std::chrono::duration_cast<std::chrono::microseconds>(end_encode - start_encode);
         double micro_sec_encode = duration_encode.count();
-        //printf("micro_sec_encode = %f us\r\n",micro_sec_encode);
   
 
         auto start_vector2Str = std::chrono::high_resolution_clock::now();
@@ -1223,7 +1063,6 @@ bool pubStreamEncryptImage(char *topic)
         auto duration_pubStr = std::chrono::duration_cast<std::chrono::microseconds>(end_pubStr - start_pubStr);
         double micro_sec_pubStr = duration_pubStr.count();
         printf("micro_sec_pubStr = %f us\r\n",micro_sec_pubStr);
-        //std::cout << encimg << std::endl;
  
         CNT_PUB++;
 
@@ -1243,7 +1082,6 @@ bool pubStreamEncryptImage(char *topic)
         loop_rate.sleep(); 
 
 
-        //return true;
     }
     capture.release();
 
@@ -1267,11 +1105,9 @@ void * captureThread(void *arguments) {
             cv::Mat frame;
             cap >> frame;  // Capture frame from the camera
 
-            //std::lock_guard<std::mutex> lock(queueMutex);
             imageQueue.push(frame);  // Put the captured frame into the queue
             printf("En Qsize : %ld\r\n",imageQueue.size());
 
-            //usleep(30000);
             usleep(100000);
 
         }
@@ -1285,34 +1121,17 @@ bool pubStreamEncryptImagePipe(char *topic)
     ros::Publisher publisher = nh.advertise<std_msgs::String>(std::string(topic),1000);
     std_msgs::String msg;
     ros::Rate loop_rate(100000); //In Herz
-    //ros::Rate loop_rate2(2);
     ros::Rate poll_rate(1);
 
 
     // 0 reads from your default camera
-    //const int CAMERA_INDEX = 0;
-    //cv::VideoCapture capture(CAMERA_INDEX); 
-
-    //if (!capture.isOpened()) {
-    //  ROS_ERROR_STREAM("Failed to open camera with index " << CAMERA_INDEX << "!");
-    //  ros::shutdown();
-    //}
-
-    //capture.set(cv::CAP_PROP_FRAME_WIDTH,320);
-    //capture.set(cv::CAP_PROP_FRAME_HEIGHT,240);
 
 
     pthread_create(&thread2, NULL, captureThread, NULL);
     cv::Mat frame;//Mat is the image class defined in OpenCV
 
-    //poll_rate.sleep();
-    //poll_rate.sleep();
-    //poll_rate.sleep();
-    //poll_rate.sleep();
-    //printf("publish started\r\n");
 
     bool first = true;
-    //std::thread captureThread(captureThread);
 
     while (nh.ok())
     {
@@ -1328,9 +1147,6 @@ bool pubStreamEncryptImagePipe(char *topic)
         }
 
 
-        //capture >> frame; 
-
-        //std::lock_guard<std::mutex> lock(queueMutex);
         if (!imageQueue.empty()) {
             frame = imageQueue.front();  // Get the first image from the queue
             imageQueue.pop();  // Remove the processed image from the queue
@@ -1355,7 +1171,6 @@ bool pubStreamEncryptImagePipe(char *topic)
 
             printf("hexString.length = %ld\r\n",ImageString.length());
             std::string encimg = createPubImageString(ImageString);
-            //std::cout << encimg << std::endl;
     
             CNT_PUB++;
 
@@ -1372,8 +1187,6 @@ bool pubStreamEncryptImagePipe(char *topic)
 
 
     }
-    //captureThread.join();
-    //capture.release();
 
     return false;
 
@@ -1416,7 +1229,6 @@ void * ThTimer(void *arguments)
                 printf("\r\n ----> Subscript rate %d fps, AVG %.2f fps <---- \r\n",sub_per_sec,avg_sub_per_sec);
             }
         }
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
   
@@ -1456,17 +1268,9 @@ int main(int argc, char **argv)
     char name[50] = {0};
     sprintf(name,"L2Topic_%lu",(unsigned long)time(NULL));
     ros::init(argc,argv,name);
-    //ROS_INFO("TOPIC L2, crypto in ROS Message");
 
     pthread_create(&thread1, NULL, ThTimer, NULL);
 
-    // printf("argc = %d\r\n",argc);
-    // for(int i = 0; i < argc; i++) {
-    //     printf("argv[%d] = %s\r\n",i,argv[i]);
-    // }
-
-    //std::string s = createJSONMessage(1,true,std::string("MDATA"),555);
-    //printf("s = %s\r\n",s.c_str());
 
     if(argc < 3) 
     {
@@ -1503,14 +1307,12 @@ int main(int argc, char **argv)
     }
     else if(strncmp(argv[1],"echo",4) == 0) 
     {
-        //printf("subscribe on topic %s\r\n",argv[2]);
         ros::NodeHandle nh;
         ros::Subscriber sub = nh.subscribe(std::string(argv[2]),100000,subMessageCallback);
         ros::spin();
     }
     else if(strncmp(argv[1],"pub",3) == 0) 
     {
-            //ROS_INFO("pub");
         if(argc < 5)
         {
             ROS_INFO("Not enough parameter");
@@ -1520,7 +1322,6 @@ int main(int argc, char **argv)
 
         if(pubOneMessage(argv[2],argv[3],argv[4]))
         {
-            //ROS_INFO("pubOneMessage");
             printf("Publish message success\r\n");
         }
         else
